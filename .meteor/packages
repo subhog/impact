@@ -6,4 +6,7 @@
 autopublish
 insecure
 preserve-inputs
+bootstrap
 router
+sugar
+jquery
