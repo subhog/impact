@@ -4,6 +4,7 @@ Impact.Themes = {};
 Impact.Cards = {};
 
 Impact.ModuleTemplates = {};
+Impact.moduleConstructors = {};
 
 
 // Impact.initialized = false;
