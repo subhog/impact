@@ -17,9 +17,9 @@ Meteor.Router.add({
                     },
   '/*':             function(match) {
                       // Impact.Yield.requestedModuleName = match.split('/')[0];
-                      console.log('Route matched');
+                      // console.log('Route matched');
                       Impact.Yield.updateState(this, match);
-                      console.log('Route will render');
+                      // console.log('Route will render');
                       // console.log("REQUESTED MODULE "+Impact.Yield.requestedModuleName);
                       // Impact.Yield.enteredPath(this, match);
                       return 'yield';
