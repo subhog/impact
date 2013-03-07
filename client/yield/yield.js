@@ -21,7 +21,9 @@ $functions(Yield, {
   },
 
   reloadModule: function() {
-
+    console.log("RELOADING MODULE");
+    console.log("REQUESTED MODULE NAME ", this.state.moduleName);
+    console.log("REQUESTED MODULE CLASS ", Impact.settings.modules[this.state.moduleName]);
   },
 
   attachModule: function(moduleName, moduleClass) {
