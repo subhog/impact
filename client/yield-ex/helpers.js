@@ -16,11 +16,13 @@ Template.yield.renderModule = function() {
     } else {
       Impact.Yield.reloadModule();
 
-      return Modules.find({}).fetch().reduce(
+      return new Handlebars.SafeString('<a href="#">LINK</a>'+
+      Modules.find({}).fetch().reduce(
         function(sum, item) {
           return sum + ' ['+item.name+': '+item.moduleClass+'] ';
         },
         ''
+      )
       );
     };
     
