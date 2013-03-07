@@ -20,6 +20,10 @@ $functions(Yield, {
     this.state.params = $.deparam(context.querystring || '');
   },
 
+  reloadModule: function() {
+
+  },
+
   attachModule: function(moduleName, moduleClass) {
     this.currentModule = Impact.ModuleManager.loadModule(name, moduleClass);
     this.currentModuleName = name;

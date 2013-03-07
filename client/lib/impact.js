@@ -27,7 +27,7 @@ Impact.Modules = {};
 
 Meteor.startup(function(){
   console.log("================================================================================");
-  console.log("REGISTERED MODULES: ", Modules.find({}).count());
+  // console.log("REGISTERED MODULES: ", Modules.find({}).count());
   // Modules.find({}).observe({
   //   added: function(newDoc) {
   //     console.log("ADDED MODULE INFO", newDoc);
