@@ -25,24 +25,27 @@ Impact.Modules = {};
 // Impact.widgetInfo = {};
 // Impact.cardInfo = {};
 
+
+
+
+
+
 Meteor.startup(function(){
   console.log("================================================================================");
-  // console.log("REGISTERED MODULES: ", Modules.find({}).count());
-  // Modules.find({}).observe({
-  //   added: function(newDoc) {
-  //     console.log("ADDED MODULE INFO", newDoc);
-  //     Impact.moduleClasses[newDoc.name] = newDoc.moduleClass;
-  //     console.log("REGISTERED MODULES: ", Modules.find({}).count());
-  //   }, 
-  //   changed: function(newDoc, oldDoc) {
-  //     delete Impact.moduleClasses[oldDoc.name];
-  //     Impact.moduleClasses[newDoc.name] = newDoc.moduleClass;
-  //     console.log("REGISTERED MODULES: ", Modules.find({}).count());
-  //   },
-  //   removed: function(oldDoc) {
-  //     delete Impact.moduleClasses[oldDoc.name];
-  //     console.log("REGISTERED MODULES: ", Modules.find({}).count());
-  //   },
 
-  // });
+  var loadedData = function(data) {
+    _.delay(function(){
+      Impact.settings = data;
+    }, 2000);
+  };
+
+  ImpactData.find({}).observe({
+    added: function(newData) {
+      loadedData(newData);
+    },
+    changed: function(newData, oldData) {
+      loadedData(newData);
+    },
+  });
+
 });
