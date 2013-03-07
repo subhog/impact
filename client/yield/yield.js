@@ -18,18 +18,30 @@ $functions(Yield, {
     this.state.moduleName = name;
     this.state.path = path;
     this.state.params = $.deparam(context.querystring || '');
+    console.log('Updated state');
   },
 
   reloadModule: function() {
-    console.log("RELOADING MODULE");
-    console.log("REQUESTED MODULE NAME ", this.state.moduleName);
-    console.log("REQUESTED MODULE CLASS ", Impact.settings.modules[this.state.moduleName]);
+    var moduleName = this.state.moduleName;
+    var moduleClass = Impact.settings.modules[moduleName];
+
+    //this.currentModule = 
+    Impact.ModuleManager.loadModule(moduleName, moduleClass);
+    //this.currentModuleName = moduleName;
   },
 
-  attachModule: function(moduleName, moduleClass) {
-    this.currentModule = Impact.ModuleManager.loadModule(name, moduleClass);
-    this.currentModuleName = name;
+  loadedModule: function(moduleName, module) {
+    if(this.state.moduleName === moduleName) {
+      this.currentModule = module;
+      this.currentModuleName = moduleName;
+      console.log("YIELD MODULE ["+moduleName+"] PREPARED");
+    }
   },
+
+  // attachModule: function(moduleName, moduleClass) {
+  //   this.currentModule = Impact.ModuleManager.loadModule(name, moduleClass);
+  //   this.currentModuleName = name;
+  // },
 
   // enteredPath: function(context, fullPath) {
 

@@ -31,12 +31,12 @@ Impact.Modules = {};
 
 
 Meteor.startup(function(){
-  console.log("================================================================================");
+  //console.log("================================================================================");
 
   var loadedData = function(data) {
-    _.delay(function(){
-      Impact.settings = data;
-    }, 2000);
+    //_.delay(function(){
+    Impact.settings = data;
+    //}, 2000);
   };
 
   ImpactData.find({}).observe({
