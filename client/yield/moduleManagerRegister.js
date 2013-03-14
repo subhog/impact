@@ -29,8 +29,7 @@
     registerFactory: function (moduleClass, factory) {
       if (this.factories[moduleClass] === factory)
         return; // nothing changed
-      this.factories[moduleClass] = factory;
-      this._pokeListeners(this._factoryListeners, moduleClass);
+      this.factories.set(moduleClass, factory);
     },
 
     registerInstance: function (moduleName, instance) {
@@ -39,13 +38,11 @@
       //-----------------------------------------------------------
       instance._impact.prefix = this.getInstancePrefix(moduleName);
       //-----------------------------------------------------------
-      this.instances[moduleName] = instance;
-      this._pokeListeners(this._instanceListeners, moduleName);
+      this.instances.set(moduleName, instance);
     },
 
     deleteModuleFactory: function (moduleClass) {
-      delete this.factories[moduleClass];
-      this._pokeListeners(this._factoryListeners, moduleClass);
+      this.factories.unset(moduleClass);
     },
 
   });

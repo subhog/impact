@@ -5,15 +5,12 @@
 
   Impact._ModuleManagerConstructor = function () {
     // manager cache
-    this.instances = {};
-    this.factories = {};
+    this.instances = new Impact.QueryDict();
+    this.factories = new Impact.QueryDict();
     // describe relation between classes and instances
-    this.config = {};
+    this.config = new Impact.QueryDict();
     // for reactivity implemantation
-    this._counters          = {};
-    this._configListeners   = {};
-    this._factoryListeners  = {};
-    this._instanceListeners = {};
+    this._counters = {};
   };
 
   $functions(Impact._ModuleManagerConstructor, {
@@ -28,54 +25,21 @@
           // Object.merge(self.config, settings.modules);
           // console.log(self.config);
           Object.keys(settings.modules).each(function(name){
-            self.config[name] = {
+            self.config.set(name, {
               moduleClass: settings.modules[name],
-            };
-            self._pokeListeners(self._configListeners[name]);
+            });
           });
         },
       })
 
     },
 
-    _pokeListeners: function (listeners, key) {
-      if (key) listeners = listeners[key];
-      //----------------------------------
-      for (var contextId in listeners) {
-        listeners[contextId].invalidate();
-      }
-    },
-
-    _catchListener: function (listeners, key) {
-      // works both with and without key value
-      var context = Meteor.deps.Context.current;
-      if (context) {
-        var listenersForKey = listeners;
-        //------------------------------
-        if (key) {
-          if (!listeners[key])
-            listeners[key] = {};
-          listenersForKey = listeners[key];
-        }
-        if (!listenersForKey[context.id]) {
-          listenersForKey[context.id] = context;
-          var self = this;
-          context.onInvalidate(function () {
-            delete listenersForKey[context.id];
-            //XXX: is this necessary???
-            if (key && Object.isEmpty(listenersForKey))
-              delete listeners[key];
-          });
-        }
-      }
-    },
-
     getModuleFactory: function (moduleClass) {
       if (!moduleClass) return;
-      //-------------------------------------------------------
-      this._catchListener(this._factoryListeners, moduleClass);
+      //----------------------------------------------------
+      var factory = this.factories.get(moduleClass);
       //TODO: put some locker to prevent multiple ajax calls
-      if (this.factories[moduleClass] === undefined) {
+      if (factory === undefined) {
         // load module soruce code
         var self = this;
         //XXX: note that the URL is hardcoded here
@@ -85,12 +49,13 @@
             type: 'GET',
             dataType: 'script',
           }).done(function (msg) {
-            self._pokeListeners(self._factoryListeners, moduleClass);
+            self.factories.changed(moduleClass);
           }).fail(function (jqXHR, textStatus) {
             //TODO: provide more information about the error
             //XXX:  not that constructor is reactive
             //      (i.e. it registers the module factory in the manager)
-            self.factories[moduleClass] = new Impact.ModuleFactory (moduleClass, {
+            //XXX: remove all hacking from here
+            self.factories._properties[moduleClass] = new Impact.ModuleFactory (moduleClass, {
               errors: {
                 message : 'an error occured while loading module ' + moduleClass,
                 reason  : textStatus,
@@ -99,12 +64,12 @@
           });
         }, 1000);
       }
-      return this.factories[moduleClass];
+      return factory;
     },
 
     getInstanceConfig: function (name) {
-      this._catchListener(this._configListeners, name);
-      return this.config[name] || {};
+      var config = this.config.get(name); // this is reactive
+      return config || {};
     },
 
     getLoader: function (name, options) {
@@ -116,16 +81,16 @@
     },
 
     getInstance: function (name) {
-      this._catchListener(this._instanceListeners, name);
+      this.instances.depend(name);
       var config = this.getInstanceConfig(name);
       var factory = this.getModuleFactory(config.moduleClass);
       if (factory) {
-        var instance = this.instances[name];
+        var instance = this.instances._properties[name];
         if (instance && instance._impact.factory === factory)
           return instance;
         // defer the instance creation process
         var self = this;
-        Meteor.setTimeout(function () {
+        Meteor.defer(function () {
           // instance created by a factory will by automatically
           // registerd in the manager
           factory.createInstance(name);

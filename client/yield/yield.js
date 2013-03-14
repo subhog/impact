@@ -2,77 +2,8 @@
 /**/(function(){/**/
 ////////////////////
 
-
-  var QueryDict = function () {
-    this._properties = {};
-    this._listeners  = {};
-  };
-
-  Impact.QueryDict = QueryDict;
-
-  $functions(QueryDict, {
-
-    get: function (key) {
-      var context = Meteor.deps.Context.current;
-      if (context) {
-        if (!this._listeners[key])
-          this._listeners[key] = {};
-        var listeners = this._listeners[key];
-        if (!listeners[context.id])
-          listeners[context.id] = context;
-        var self = this;
-        context.onInvalidate(function () {
-          delete listeners[context.id];
-          //TODO: is it necessary???
-          if (Object.isEmpty(listeners))
-            delete self._listeners[key];
-        });
-      }
-      return this._properties[key];
-    },
-
-    set: function (key, value) {
-      if (value === this._properties[key])
-        return;
-      this._properties[key] = value;
-      this._invalidateKey(key);
-    },
-
-    unset: function (key) {
-      if (!Object.has(this._properties, key))
-        return;
-      delete this._properties[key];
-      this._invalidateKey(key);
-    },
-
-    fetch: function (key, value) {
-      var self = this, data = {};
-      Object.each(this._properties, function (key) {
-        data[key] = self.get(key);
-      });
-      return data;
-    },
-
-    copy: function (object) {
-      var self = this;
-      Object.each(object, function (key, value) {
-        self.set(key, value);
-      });
-      Object.each(this._properties, function (key) {
-        if (!Object.has(object, key))
-          self.unset(key);
-      });
-    },
-
-    _invalidateKey: function (key) {
-      for (var contextId in this._listeners[key])
-        this._listeners[key][contextId].invalidate();
-    },
-
-  });
-
   var Yield = function () {
-    this.listeners = {};
+    this._dependency = new Deps.Dependency;
     this.moduleName  = null;
     this.path = [];
     //XXX: this will be initialized on demand
@@ -81,30 +12,13 @@
   
   $functions(Yield, {
 
-    _reactive: function () {
-      var context = Meteor.deps.Context.current;
-      if (context && !this.listeners[context.id]) {
-        this.listeners[context.id] = context;
-        var self = this;
-        context.onInvalidate(function () {
-          delete self.listeners[context.id];
-        });
-      }
-    },
-
-    _invalidate: function () {
-      for (var contextId in this.listeners) {
-        this.listeners[contextId].invalidate();
-      }
-    },
-
     getCurrentModule: function () {
-      this._reactive();
+      Deps.depend(this._dependency);
       return this.moduleName;
     },
 
     getPath: function () {
-      this._reactive();
+      Deps.depend(this._dependency);
       return this.path;
     },
 
@@ -121,14 +35,14 @@
       this.path = path;
       this.fullPath = fullPath;
       this.getParams().copy(params);
-      this._invalidate();
+      this._dependency.changed();
     },
 
     setPathAndParams: function (path, params) {
       //TODO: check for changes
       this.path = path;
       this.getParams().copy(params);
-      this._invalidate();
+      this._dependency.changed();
     },
 
     setParam: function (key, value) {
@@ -142,7 +56,6 @@
       var params = $.deparam(context.querystring || '');
       this.setCurrentModuleAndState(name, path, params, fullPath);
     },
-
 
     matchRoute: function(map) {
       var self = this;
