@@ -41,7 +41,7 @@ $functions(Source, {
     var ret = '';
 
     ret += "(function(){\n\n";                                                       // OPEN #1
-    ret += "new Impact.ModuleFactory('"+this.name+"',{\n";        // OPEN #2
+    ret += "(new Impact.ModuleFactory('"+this.name+"',{\n";        // OPEN #2
 
     ret += "templates: {\n\n";
     ret += this.templates;
@@ -55,7 +55,7 @@ $functions(Source, {
     ret += "\n},\n\n";
 
 
-    ret += "});\n";                                                   // CLOSE #2
+    ret += "})).register();\n";                                                   // CLOSE #2
     ret += "\n})();\n";                                               // CLOSE #1
     // ret += "console.log('END OF FILE REACHED');\n";
     return ret;
@@ -71,7 +71,7 @@ $functions(Source, {
     ret += "\n};";
     ret += "},\n";
 
-    ret += "});";                                                   // CLOSE #2
+    ret += "});";                                        // CLOSE #2
     ret += "})();\n";                                                // CLOSE #1
     return ret;
   },

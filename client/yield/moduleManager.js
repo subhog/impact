@@ -10,6 +10,7 @@
     // describe relation between classes and instances
     this.config = new Impact.QueryDict();
     // for reactivity implemantation
+    this._prefixes = {};
     this._counters = {};
   };
 
@@ -49,18 +50,18 @@
             type: 'GET',
             dataType: 'script',
           }).done(function (msg) {
-            self.factories.changed(moduleClass);
+            //self.factories.changed(moduleClass);
           }).fail(function (jqXHR, textStatus) {
             //TODO: provide more information about the error
             //XXX:  not that constructor is reactive
             //      (i.e. it registers the module factory in the manager)
             //XXX: remove all hacking from here
-            self.factories._properties[moduleClass] = new Impact.ModuleFactory (moduleClass, {
+            (new Impact.ModuleFactory (moduleClass, {
               errors: {
                 message : 'an error occured while loading module ' + moduleClass,
                 reason  : textStatus,
               }
-            });
+            })).register();
           });
         }, 1000);
       }
@@ -78,6 +79,10 @@
       options.isLoader = true;
       // we use undefined to prevent module registration
       return new Impact.ModuleInstance(undefined, options);
+    },
+
+    getPrefix: function (moduleName) {
+      return this._prefixes[moduleName];
     },
 
     getInstance: function (name) {

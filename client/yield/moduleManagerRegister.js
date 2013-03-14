@@ -8,7 +8,7 @@
     //TODO: print warnings in case of possible overwriting
     //TODO: more inteligent comparision
 
-    getInstancePrefix: function (name) {
+    _createInstancePrefix: function (name) {
       // It starts with 1 now! Dislike.
       var value = (this._counters[name] || 0) + 1;
       this._counters[name] = value;
@@ -35,9 +35,10 @@
     registerInstance: function (moduleName, instance) {
       if (this.instances[moduleName] === instance)
         return; // nothing changed
-      //-----------------------------------------------------------
-      instance._impact.prefix = this.getInstancePrefix(moduleName);
-      //-----------------------------------------------------------
+      //---------------------------------------------------------------
+      instance._impact.prefix = this._createInstancePrefix(moduleName);
+      //---------------------------------------------------------------
+      this._prefixes[moduleName] = instance._impact.prefix;
       this.instances.set(moduleName, instance);
     },
 

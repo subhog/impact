@@ -26,10 +26,20 @@ Impact.ModuleFactory = function (moduleClass, options) {
   }
     
   // register this factory
-  if (moduleClass)
-    Impact.ModuleManager.registerFactory(moduleClass, this);
+  //this.register();
 };
 
+$functions(Impact.ModuleFactory, {
+
+  register: function () {
+    if (this.moduleClass) {
+      Impact.ModuleManager.registerFactory (this.moduleClass, this);
+    } else {
+      console.log('WARNING! Cannot register ModuleFactory with undefined moduleClass');
+    }
+  },
+
+});
 
 ////////////////////
 /*********/})();/**/

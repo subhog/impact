@@ -18,8 +18,9 @@
       // a module instance created this way is automatically
       // registered int the module manager
       var instance = new Impact.ModuleInstance(name, options);
-      //------------------------------------------------------
-      var prefix = instance._impact.prefix;
+      instance.register();
+      //------------------------------------------------
+      var prefix = Impact.ModuleManager.getPrefix(name);
       var _Template = {};
 
       // install templates in global context
