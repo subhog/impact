@@ -26,9 +26,7 @@
           // Object.merge(self.config, settings.modules);
           // console.log(self.config);
           Object.keys(settings.modules).each(function(name){
-            self.config.set(name, {
-              moduleClass: settings.modules[name],
-            });
+            self.config.set(name, settings.modules[name]);
           });
         },
       })
