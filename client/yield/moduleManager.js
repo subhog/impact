@@ -83,10 +83,42 @@
       return this._prefixes[moduleName];
     },
 
+    getLoaderInstance: function (options) {
+      options = options || {};
+      // prepare error list
+      if (Object.isString(options.errors))
+        options.errors = [{
+          message : 'an error occured while loading module `' + options.moduleName + '`',
+          reason  : options.errors,
+        }];
+      if (Object.isObject(options.errors))
+        options.errors = [options.errors, ];
+      // return module instance
+      return {
+        isLoader : true,
+        errors   : options.errors,
+        message  : options.message,
+        render   : function () {
+          var template = Template['loader'];
+          if (!template)
+            return 'ERROR: Template `loader` does not exist!';
+          return template(this);
+        },
+      }
+    },
+
     getInstance: function (name) {
       this.instances.depend(name);
       var config = this.getInstanceConfig(name);
       var factory = this.getModuleFactory(config.moduleClass);
+      
+      var settings = ImpactSettings.findOne({});
+      if (!settings)
+        return this.getLoaderInstance({
+          moduleName : name,
+          message    : 'loading settings',
+        }); // loading settings
+
       if (factory) {
         var instance = this.instances._properties[name];
         if (instance && instance._impact.factory === factory)
